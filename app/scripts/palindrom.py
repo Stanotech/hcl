@@ -7,8 +7,8 @@ for i in range(len(s)):
         j = 0
         
         while True:
-            left = i - j if even else i - j
-            right = i + j + 1
+            left = i - j
+            right = i + j + 1 if even else i + j
             
             if left < 0 or right >= len(s) or s[left] != s[right]:
                 break
