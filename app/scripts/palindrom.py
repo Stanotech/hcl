@@ -2,7 +2,7 @@ s = "fdsbaabghdshfvdabcdefedcba"
 longest = ""
 
 for i in range(len(s)):
-    for even in (True, False):  # Sprawdzamy zarówno parzyste, jak i nieparzyste palindromy
+    for even in (True, False):
         length = 2 if even else 1
         j = 0
         
@@ -16,8 +16,7 @@ for i in range(len(s)):
             length += 2
             j += 1
 
-        # Aktualizujemy najdłuższy palindrom
-        palindrome = s[left + 1:right]  # Poprawny zakres podciągu
+        palindrome = s[left + 1:right]
         if len(palindrome) > len(longest):
             longest = palindrome
 
