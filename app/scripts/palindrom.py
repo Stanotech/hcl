@@ -1,29 +1,18 @@
 string = "fdsaghdshfvdabcdefedcba"
-j=1
 
-for i in range(len(string)-1):
-    if string[i] == string[i+1]:
-        length = 2
-        try:
-            while j:
-                if string[i-j] == string [i+j+1]:
-                    length += 2
-                    j += 1
-                else:
-                    break            
-        except:
-            print(string[int(i-length/2+1):int(i+length/2+1)])
-            continue
-
-    if string[i-1] == string[i+1]:
-        try:
-            length = 3
-            while j:
-                if string[i-j-1] == string [i+j+1]:
-                    length += 2
-                    j += 1
-                else:
-                    break
-        except:
-            print(string[int(i-length/2+1):int(i+length/2+1)])
-            continue
+for i in range(len(s) - 1):
+        for even in (True, False):  # Sprawdzamy zarówno parzyste, jak i nieparzyste palindromy
+            length = 2 if even else 3
+            j = 1
+            try:
+                while True:
+                    left = i - j if even else i - j - 1
+                    right = i + j + 1
+                    if s[left] == s[right]:
+                        length += 2
+                        j += 1
+                    else:
+                        break
+            except IndexError:
+                print(s[int(i - length / 2 + 1):int(i + length / 2 + 1)])
+                continue
