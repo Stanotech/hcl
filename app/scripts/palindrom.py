@@ -1,4 +1,4 @@
-string = "fdsaghdshfvdabcdefedcba"
+s = "fdsaghdshfvdabcdefedcba"
 
 for i in range(len(s) - 1):
         for even in (True, False):  # Sprawdzamy zarówno parzyste, jak i nieparzyste palindromy
