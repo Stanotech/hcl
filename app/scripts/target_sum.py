@@ -11,8 +11,8 @@ while idx1 < idx2:
         idx2 -= 1
         idx1 -= 1
 
-    if nums[idx1] + nums[idx2] < target:
+    elif nums[idx1] + nums[idx2] < target:
         idx1 += 1
 
-    if nums[idx1] + nums[idx2] > target:
+    elif nums[idx1] + nums[idx2] > target:
         idx2 -= 1
