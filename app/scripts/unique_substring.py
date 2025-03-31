@@ -3,28 +3,28 @@
 s = "abcghjabcvfdertyujhasd"
 
 s_max = ""
-indexes = []
-dic = {}
+repeated_indexes = []
+char_positions = {}
 max_length = 0
 
 for idx, char in enumerate(s):
-    if char in dic:
-        dic[char].append(idx)
+    if char in char_positions:
+        char_positions[char].append(idx)
     else:
-        dic[char] = [idx]
+        char_positions[char] = [idx]
 
-for key in dic:
-    if len(dic[key]) > 1:
-        for id in dic[key]:
-            indexes.append(id)
+for indexes in char_positions.values():
+        if len(indexes) > 1:
+            repeated_indexes.extend(indexes)
 
-indexes.sort()
+repeated_indexes.sort() # List of indexes of repeated characters
 
-for idx in range(len(indexes)-1):
-    length = indexes[idx+1] - indexes[idx]
+for idx in range(len(repeated_indexes)-1):
+    length = repeated_indexes[idx+1] - repeated_indexes[idx]
     if length > max_length:
         max_length = length
-        s_max = s[indexes[idx]:indexes[idx+1]]
+        s_max = s[repeated_indexes[idx]+1:repeated_indexes[idx+1]]
+
 
 print(s_max)
 
