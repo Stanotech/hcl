@@ -1,3 +1,5 @@
+# Print out all anagrams from string
+
 s = "cbaebabacdacbca"
 target = "abc"
 
