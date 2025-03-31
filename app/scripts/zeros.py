@@ -1,4 +1,4 @@
-
+# HCl first script. Zeros to end.
 
 
 arr = [0, 0, 0, 1, 0, 4, 3, 0, 4, 9, 10, 0, 0, 0]

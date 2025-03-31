@@ -1,4 +1,4 @@
-# create list of multiplying all numbers except actual position
+# Create list of multiplying all numbers except actual position
 
 list = [1, 2, 6, 4, 2, 7, 5, 3]
 end_list =[]

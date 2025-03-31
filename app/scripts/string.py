@@ -1,3 +1,5 @@
+# Longest string with unique chars
+
 string = "gdowvdfnsadsoapdguregsadklpeierbyusaklhfhewkfnksmacnvjxcvxqlnfejrk"
 string_now = string_max = ""
 i=0

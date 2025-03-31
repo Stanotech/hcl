@@ -1,3 +1,5 @@
+# Longest palindrom
+
 s = "fdsbaabghdshfvdabcdefedcba"
 longest = ""
 
@@ -20,4 +22,4 @@ for i in range(len(s)):
         if len(palindrome) > len(longest):
             longest = palindrome
 
-print("Najdłuższy palindrom:", longest)
+print("Longest palindrom:", longest)

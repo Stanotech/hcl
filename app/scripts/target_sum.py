@@ -1,3 +1,4 @@
+# Print all pairs which sum is 18
 nums = [-20, -15, -10, -5, 0, 2, 3, 6, 7, 8, 9, 12, 14, 16, 18, 21, 23]
 target = 18
 
