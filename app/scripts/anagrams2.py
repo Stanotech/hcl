@@ -1,3 +1,5 @@
+# Combine anagrams in groups
+
 words = ["eat", "tea", "tan", "ate", "nat", "bat"]
 anagrams = {}
 
