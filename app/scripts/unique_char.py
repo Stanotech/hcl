@@ -6,7 +6,7 @@ def first_unique_char(str):
         else:
             dic[char] = [idx]
 
-    for key, value in dic.items():
+    for value in dic.values():
         if len(value) == 1: 
             return value[0]
     
