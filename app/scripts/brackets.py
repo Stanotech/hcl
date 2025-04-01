@@ -6,18 +6,15 @@
 
 
 def is_valid(string):
-    stack = ""
+    bracket_map = {')': '(', '}': '{', ']': '['}
+    stack = []
     for i in range(len(string)):
         if string[i] in "{[(":
-            stack += string[i]
-        elif (
-            string[i] == ")" and stack[-1] == "("
-            or string[i] == "]" and stack[-1] == "["
-            or string[i] == "}" and stack[-1] == "{"):
-            
-            stack = stack[:-1]
+            stack.append(string[i])
+        elif stack[-1] == bracket_map[string[i]]:
+            stack.pop()
 
-    if stack == "":
+    if stack == []:
         return True
     else:
         return False
