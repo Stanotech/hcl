@@ -1,4 +1,4 @@
-# Write a Python function that finds the longest substring without repeating characters from a given string.
+# HCl. Write a Python function that finds the longest substring without repeating characters from a given string.
 
 s = "abcghjabcvfdertyujhasd"
 
