@@ -18,6 +18,7 @@ for indexes in char_positions.values():
             repeated_indexes.extend(indexes)
 
 repeated_indexes.sort() # List of indexes of repeated characters
+print(repeated_indexes)
 
 for idx in range(len(repeated_indexes)-1):
     length = repeated_indexes[idx+1] - repeated_indexes[idx]
