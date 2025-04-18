@@ -7,11 +7,10 @@ def most_char(s, k):
         for char in str1:
             dic[char] = dic.get(char, 0) + 1
         
-        sort = sorted(dic.items(), key = lambda item:item[1], reverse = True)
-        if sort[0][1] > count:
-            count = sort[0][1]
+        maxim = max(dic.values())
+        if maxim > count:
+            count = maxim
             longest = str1
-
 
     print(longest)
 
