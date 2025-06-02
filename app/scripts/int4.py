@@ -1,23 +1,23 @@
 class Node:
-
     def __init__(self, val, right=None, left=None):
         self.val = val
         self.right = right
         self.left = left
 
 class Solution:
-    def check_sum(self, root, target_sum, sum):         
-        if root == None:
+    def check_sum(self, root, target_sum, current_sum=0):         
+        if root is None:
             return False
         
-        sum += root.val
+        current_sum += root.val
 
-        if root.left == None and root.right == None:
-            if sum == target_sum:
-                return True
+        if root.left is None and root.right is None:
+            return current_sum == target_sum
 
-        return self.check_sum(root.left, target_sum, sum) or self.check_sum(root.right, target_sum, sum)
-
+        return (
+            self.check_sum(root.left, target_sum, current_sum) or
+            self.check_sum(root.right, target_sum, current_sum)
+        )
 
 tree = Node(5,
             Node(4,
@@ -26,8 +26,7 @@ tree = Node(5,
                  Node(13),
                  Node(4, None, Node(1))))
 
-sum = 0
 sol = Solution()
-print(sol.check_sum(tree, 22, sum))  # True
-print(sol.check_sum(tree, 26, sum))  # True (5->8->13)
-print(sol.check_sum(tree, 100, sum)) # False
+print(sol.check_sum(tree, 22))  # True
+print(sol.check_sum(tree, 26))  # True
+print(sol.check_sum(tree, 100)) # False
