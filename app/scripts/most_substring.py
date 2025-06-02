@@ -2,10 +2,7 @@ def most_frequent_unique_triplet(s):
     unique_substrings = []
     for idx in range(len(s)-2):
         str1 = s[idx:idx+3]
-        dic= {}
-        for char in str1:
-            dic[char] = dic.get(char, 0) + 1
-        if list(dic.values()) == [1,1,1]:
+        if len(set(str1)) == 3:
             unique_substrings.append(str1)
     
     max_count = 0
