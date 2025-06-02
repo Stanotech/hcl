@@ -13,12 +13,10 @@ for idx in range(1, len(s)):
     print(f"idx {idx}, actual {s[idx]}, second {second}, next {next}, length {length}")
 
     if s[idx] != s[idx-1]:
-        print("jaktokurwa")
         if s[idx] == next:                
             next = s[idx-1]
             length += 1
         else:
-            print("hapaciapa")
             if length > max:
                 max = length
                 max_string = s[idx-length:idx]
