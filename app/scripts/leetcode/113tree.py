@@ -17,7 +17,7 @@ class Solution(object):
             current_sum += node.val
             
             if not node.left and not node.right and current_sum == targetSum:
-                result.append(list(current_path))  # robimy kopię listy
+                result.append(current_path.copy())
             
             dfs(node.left, current_path, current_sum)
             dfs(node.right, current_path, current_sum)
