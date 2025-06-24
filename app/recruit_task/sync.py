@@ -36,24 +36,45 @@ class FolderSynchronizer:
             rel_root = Path(root).relative_to(self.source)
             replica_root = self.replica / rel_root
 
-            # Ensure all directories exist in replica
-            for dir_name in dirs:
-                target_dir = replica_root / dir_name
-                if not target_dir.exists():
-                    target_dir.mkdir(parents=True)
-                    self.logger.info(f"Created directory: {target_dir}")
+            self._sync_directories(dirs, replica_root, Path(root))
+            self._sync_files(files, replica_root, Path(root))
 
-            # Handle files
-            for file_name in files:
-                source_file = Path(root) / file_name
-                replica_file = replica_root / file_name
+    def _sync_directories(self, dirs, replica_root: Path, source_root: Path):
+        for dir_name in dirs:
+            source_dir = source_root / dir_name
+            target_dir = replica_root / dir_name
 
-                if not replica_file.exists():
-                    self._safe_copy(source_file, replica_file)
-                    self.logger.info(f"Copied new file: {replica_file}")
-                elif self._files_differ(source_file, replica_file):
-                    self._safe_copy(source_file, replica_file)
-                    self.logger.info(f"Updated file: {replica_file}")
+            if source_dir.is_symlink():
+                link_target = os.readlink(source_dir)
+                if target_dir.exists() or target_dir.is_symlink():
+                    target_dir.unlink()
+                target_dir.parent.mkdir(parents=True, exist_ok=True)
+                os.symlink(link_target, target_dir)
+                self.logger.info(f"Created symlink directory: {target_dir} -> {link_target}")
+                continue
+            elif not target_dir.exists():
+                target_dir.mkdir(parents=True)
+                self.logger.info(f"Created directory: {target_dir}")
+
+    def _sync_files(self, files, replica_root: Path, source_root: Path):
+        for file_name in files:
+            source_file = source_root / file_name
+            replica_file = replica_root / file_name
+
+            if source_file.is_symlink():
+                link_target = os.readlink(source_file)
+                if replica_file.exists() or replica_file.is_symlink():
+                    replica_file.unlink()
+                replica_file.parent.mkdir(parents=True, exist_ok=True)
+                os.symlink(link_target, replica_file)
+                self.logger.info(f"Created symlink file: {replica_file} -> {link_target}")
+                continue
+            elif not replica_file.exists():
+                self._safe_copy(source_file, replica_file)
+                self.logger.info(f"Copied new file: {replica_file}")
+            elif self._files_differ(source_file, replica_file):
+                self._safe_copy(source_file, replica_file)
+                self.logger.info(f"Updated file: {replica_file}")
 
     def _delete_removed_files(self):
         for root, dirs, files in os.walk(self.replica, topdown=False):
