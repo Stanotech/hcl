@@ -5,9 +5,8 @@ import time
 import logging
 import sys
 from pathlib import Path
+from typing import Optional
 
-
-#TODO add symlink operations if needed
 
 class FolderSynchronizer:
     def __init__(self, source: Path, replica: Path, logger: logging.Logger):
@@ -128,15 +127,16 @@ class FolderSynchronizer:
     def _files_differ(self, file1: Path, file2: Path) -> bool:
         return self._md5(file1) != self._md5(file2)
 
-    def _md5(self, file_path: Path) -> str:
+    def _md5(self, file_path: Path) -> Optional[str]:
         hash_md5 = hashlib.md5()
         try:
             with file_path.open("rb") as f:
                 for chunk in iter(lambda: f.read(4096), b""):
                     hash_md5.update(chunk)
+            return hash_md5.hexdigest()
         except Exception as e:
             self.logger.error(f"Error reading file {file_path}: {e}")
-        return hash_md5.hexdigest()
+            return None
 
 def setup_logger(log_file: str) -> logging.Logger:
     logger = logging.getLogger("FolderSynchronizer")
