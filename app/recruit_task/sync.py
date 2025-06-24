@@ -147,6 +147,9 @@ def main():
     try:
         interval = int(sys.argv[3])
         repetitions = int(sys.argv[4])
+        if interval <= 0 or repetitions <= 0:
+            print("Error: interval and sync_count must be positive integers.")
+            return
     except ValueError:
         print("Interval and sync_count must be integers.")
         return
