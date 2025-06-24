@@ -106,7 +106,7 @@ class FolderSynchronizer:
                     except Exception as e:
                         self.logger.warning(f"Failed to delete directory {replica_dir}: {e}")
 
-    def _safe_copy(self, source: Path, target: Path, retries: int = 3):
+    def _safe_copy(self, source: Path, target: Path, retries: int = 3, delay: float = 1.0):
         for attempt in range(retries):
             try:
                 source_hash_before = self._md5(source)
@@ -122,6 +122,8 @@ class FolderSynchronizer:
                 break
             except Exception as e:
                 self.logger.error(f"Error copying file {source} to {target}: {e}")
+            if attempt < retries - 1:
+                time.sleep(delay)
         self.logger.error(f"Failed to copy consistent version of file after {retries} attempts: {source}")
 
     def _files_differ(self, file1: Path, file2: Path) -> bool:
