@@ -31,7 +31,7 @@ class FolderSynchronizer:
             self.logger.info(f"Created replica folder: {self.replica}")
 
     def _copy_and_update_files(self):
-        for root, dirs, files in os.walk(self.source):
+        for root, dirs, files in os.walk(self.source, followlinks=True):
             rel_root = Path(root).relative_to(self.source)
             replica_root = self.replica / rel_root
 
