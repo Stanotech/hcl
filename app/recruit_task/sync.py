@@ -124,6 +124,7 @@ class FolderSynchronizer:
 
 
     def _files_differ(self, file1: Path, file2: Path) -> bool:
+        
         if file1.is_symlink() != file2.is_symlink():
             return True
 
@@ -134,7 +135,14 @@ class FolderSynchronizer:
                 self.logger.error(f"Error reading symlinks: {e}")
                 return True
 
-        return self._sha256(file1) != self._sha256(file2)
+        hash1 = self._sha256(file1)
+        hash2 = self._sha256(file2)
+
+        if hash1 is None or hash2 is None:
+            self.logger.error(f"Could not compare files: {file1}, {file2} due to read error.")
+            return True
+        
+        return hash1 != hash2
 
 
     def _sha256(self, file_path: Path) -> Optional[str]:
@@ -196,7 +204,10 @@ def main():
 
     for i in range(repetitions):
         logger.info(f"--- Synchronization {i + 1}/{repetitions} ---")
-        synchronizer.synchronize()
+        try:
+            synchronizer.synchronize()
+        except Exception as e:
+            logger.exception(f"Exception during synchronization {i + 1}: {e}")
         if i < repetitions - 1:
             time.sleep(interval)
 
