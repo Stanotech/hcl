@@ -16,7 +16,7 @@ class FolderSynchronizer:
 
     def synchronize(self):
         try:
-            self._delete_removed_files()    # Delete first to prevent conflict between folder and file with the same name
+            self._delete_differences()    # Delete first to prevent conflict between folder and file with the same name
             self._ensure_replica_exists()
             self._copy_and_update_files()
         except (KeyboardInterrupt, SystemExit):
@@ -45,8 +45,6 @@ class FolderSynchronizer:
 
             if source_dir.is_symlink():
                 link_target = os.readlink(source_dir)
-                if target_dir.exists() or target_dir.is_symlink():
-                    target_dir.unlink()
                 target_dir.parent.mkdir(parents=True, exist_ok=True)
                 os.symlink(link_target, target_dir)
                 self.logger.info(f"Created symlink directory: {target_dir} -> {link_target}")
@@ -62,8 +60,6 @@ class FolderSynchronizer:
 
             if source_file.is_symlink():
                 link_target = os.readlink(source_file)
-                if replica_file.exists() or replica_file.is_symlink():
-                    replica_file.unlink()
                 replica_file.parent.mkdir(parents=True, exist_ok=True)
                 os.symlink(link_target, replica_file)
                 self.logger.info(f"Created symlink file: {replica_file} -> {link_target}")
@@ -75,7 +71,7 @@ class FolderSynchronizer:
                 self._safe_copy(source_file, replica_file)
                 self.logger.info(f"Updated file: {replica_file}")
 
-    def _delete_removed_files(self):
+    def _delete_differences(self):
         for root, dirs, files in os.walk(self.replica, topdown=False):
             rel_root = Path(root).relative_to(self.replica)
             source_root = self.source / rel_root
@@ -84,7 +80,7 @@ class FolderSynchronizer:
             for file_name in files:
                 replica_file = Path(root) / file_name
                 source_file = source_root / file_name
-                if not source_file.exists():
+                if not source_file.exists() or self._files_differ(source_file, replica_file):
                     try:
                         replica_file.unlink()
                         self.logger.info(f"Deleted file: {replica_file}")
@@ -97,7 +93,7 @@ class FolderSynchronizer:
             for dir_name in dirs:
                 replica_dir = Path(root) / dir_name
                 source_dir = source_root / dir_name
-                if not source_dir.exists() and not any(replica_dir.iterdir()):
+                if not source_dir.exists():
                     try:
                         replica_dir.rmdir()
                         self.logger.info(f"Deleted directory: {replica_dir}")
