@@ -1,9 +1,9 @@
+import hashlib
+import logging
 import os
 import shutil
-import hashlib
-import time
-import logging
 import sys
+import time
 from pathlib import Path
 from typing import Optional
 
@@ -16,11 +16,13 @@ class FolderSynchronizer:
 
     def synchronize(self):
         try:
-            self._delete_differences()    # Delete first to prevent conflict between folder and file with the same name
+            self._delete_differences()  # Delete first to prevent conflict between folder and file with the same name
             self._ensure_replica_exists()
             self._copy_and_update_files()
         except (KeyboardInterrupt, SystemExit):
-            self.logger.error("Critical interruption during synchronization. Propagating exception.")
+            self.logger.error(
+                "Critical interruption during synchronization. Propagating exception."
+            )
             raise
         except Exception as e:
             self.logger.error(f"Unexpected error during synchronization: {e}")
@@ -47,7 +49,9 @@ class FolderSynchronizer:
                 link_target = os.readlink(source_dir)
                 target_dir.parent.mkdir(parents=True, exist_ok=True)
                 os.symlink(link_target, target_dir)
-                self.logger.info(f"Created symlink directory: {target_dir} -> {link_target}")
+                self.logger.info(
+                    f"Created symlink directory: {target_dir} -> {link_target}"
+                )
                 continue
             elif not target_dir.exists():
                 target_dir.mkdir(parents=True)
@@ -62,7 +66,9 @@ class FolderSynchronizer:
                 link_target = os.readlink(source_file)
                 replica_file.parent.mkdir(parents=True, exist_ok=True)
                 os.symlink(link_target, replica_file)
-                self.logger.info(f"Created symlink file: {replica_file} -> {link_target}")
+                self.logger.info(
+                    f"Created symlink file: {replica_file} -> {link_target}"
+                )
                 continue
             elif not replica_file.exists():
                 self._safe_copy(source_file, replica_file)
@@ -80,14 +86,20 @@ class FolderSynchronizer:
             for file_name in files:
                 replica_file = Path(root) / file_name
                 source_file = source_root / file_name
-                if not source_file.exists() or self._files_differ(source_file, replica_file):
+                if not source_file.exists() or self._files_differ(
+                    source_file, replica_file
+                ):
                     try:
                         replica_file.unlink()
                         self.logger.info(f"Deleted file: {replica_file}")
                     except PermissionError as e:
-                        self.logger.error(f"Permission denied deleting file {replica_file}: {e}")
+                        self.logger.error(
+                            f"Permission denied deleting file {replica_file}: {e}"
+                        )
                     except Exception as e:
-                        self.logger.warning(f"Failed to delete file {replica_file}: {e}")
+                        self.logger.warning(
+                            f"Failed to delete file {replica_file}: {e}"
+                        )
 
             # Delete empty directories not in source
             for dir_name in dirs:
@@ -98,11 +110,17 @@ class FolderSynchronizer:
                         replica_dir.rmdir()
                         self.logger.info(f"Deleted directory: {replica_dir}")
                     except PermissionError as e:
-                        self.logger.error(f"Permission denied deleting directory {replica_dir}: {e}")
+                        self.logger.error(
+                            f"Permission denied deleting directory {replica_dir}: {e}"
+                        )
                     except Exception as e:
-                        self.logger.warning(f"Failed to delete directory {replica_dir}: {e}")
+                        self.logger.warning(
+                            f"Failed to delete directory {replica_dir}: {e}"
+                        )
 
-    def _safe_copy(self, source: Path, target: Path, retries: int = 3, delay: float = 1.0):
+    def _safe_copy(
+        self, source: Path, target: Path, retries: int = 3, delay: float = 1.0
+    ):
         for attempt in range(retries):
             try:
                 source_hash_before = self._sha256(source)
@@ -112,19 +130,23 @@ class FolderSynchronizer:
 
                 if source_hash_before == source_hash_after == target_hash:
                     return
-                self.logger.warning(f"Source file changed during copy: {source}. Retrying ({attempt + 1}/{retries})")
+                self.logger.warning(
+                    f"Source file changed during copy: {source}. Retrying ({attempt + 1}/{retries})"
+                )
             except PermissionError as e:
-                self.logger.error(f"Permission denied copying file {source} to {target}: {e}")
+                self.logger.error(
+                    f"Permission denied copying file {source} to {target}: {e}"
+                )
                 break
             except Exception as e:
                 self.logger.error(f"Error copying file {source} to {target}: {e}")
             if attempt < retries - 1:
                 time.sleep(delay)
-        self.logger.error(f"Failed to copy consistent version of file after {retries} attempts: {source}")
-
+        self.logger.error(
+            f"Failed to copy consistent version of file after {retries} attempts: {source}"
+        )
 
     def _files_differ(self, file1: Path, file2: Path) -> bool:
-        
         if file1.is_symlink() != file2.is_symlink():
             return True
 
@@ -139,13 +161,14 @@ class FolderSynchronizer:
         hash2 = self._sha256(file2)
 
         if hash1 is None or hash2 is None:
-            self.logger.error(f"Could not compare files: {file1}, {file2} due to read error.")
+            self.logger.error(
+                f"Could not compare files: {file1}, {file2} due to read error."
+            )
             return True
-        
+
         return hash1 != hash2
 
-
-    def _sha256(self, file_path: Path) -> Optional[str]:
+    def _sha256(self, file_path: Path) -> Optional[str]:  # More precise than md5
         hash_sha256 = hashlib.sha256()
         try:
             with file_path.open("rb") as f:
@@ -156,6 +179,7 @@ class FolderSynchronizer:
             self.logger.error(f"Error reading file {file_path}: {e}")
             return None
 
+
 def setup_logger(log_file: str) -> logging.Logger:
     logger = logging.getLogger("FolderSynchronizer")
     logger.setLevel(logging.INFO)
@@ -163,9 +187,9 @@ def setup_logger(log_file: str) -> logging.Logger:
     if logger.hasHandlers():
         logger.handlers.clear()
 
-    formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
+    formatter = logging.Formatter("%(asctime)s - %(levelname)s - %(message)s")
 
-    file_handler = logging.FileHandler(log_file, mode='w')
+    file_handler = logging.FileHandler(log_file, mode="w")
     file_handler.setFormatter(formatter)
 
     console_handler = logging.StreamHandler()
@@ -176,9 +200,12 @@ def setup_logger(log_file: str) -> logging.Logger:
 
     return logger
 
+
 def main():
     if len(sys.argv) != 6:
-        print("Usage: python sync.py <source_folder> <replica_folder> <interval_seconds> <sync_count> <log_file>")
+        print(
+            "Usage: python sync.py <source_folder> <replica_folder> <interval_seconds> <sync_count> <log_file>"
+        )
         return
 
     source_path = Path(sys.argv[1]).resolve()
@@ -197,7 +224,9 @@ def main():
     logger = setup_logger(log_file)
 
     if not source_path.exists() or not source_path.is_dir():
-        logger.error(f"Source folder does not exist or is not a directory: {source_path}")
+        logger.error(
+            f"Source folder does not exist or is not a directory: {source_path}"
+        )
         return
 
     synchronizer = FolderSynchronizer(source_path, replica_path, logger)
@@ -210,6 +239,7 @@ def main():
             logger.exception(f"Exception during synchronization {i + 1}: {e}")
         if i < repetitions - 1:
             time.sleep(interval)
+
 
 if __name__ == "__main__":
     main()
