@@ -126,8 +126,20 @@ class FolderSynchronizer:
                 time.sleep(delay)
         self.logger.error(f"Failed to copy consistent version of file after {retries} attempts: {source}")
 
+
     def _files_differ(self, file1: Path, file2: Path) -> bool:
+        if file1.is_symlink() != file2.is_symlink():
+            return True
+
+        if file1.is_symlink() and file2.is_symlink():
+            try:
+                return os.readlink(file1) != os.readlink(file2)
+            except OSError as e:
+                self.logger.error(f"Error reading symlinks: {e}")
+                return True
+
         return self._sha256(file1) != self._sha256(file2)
+
 
     def _sha256(self, file_path: Path) -> Optional[str]:
         hash_sha256 = hashlib.sha256()
