@@ -109,10 +109,10 @@ class FolderSynchronizer:
     def _safe_copy(self, source: Path, target: Path, retries: int = 3, delay: float = 1.0):
         for attempt in range(retries):
             try:
-                source_hash_before = self._md5(source)
+                source_hash_before = self._sha256(source)
                 shutil.copy2(source, target)
-                target_hash = self._md5(target)
-                source_hash_after = self._md5(source)
+                target_hash = self._sha256(target)
+                source_hash_after = self._sha256(source)
 
                 if source_hash_before == source_hash_after == target_hash:
                     return
@@ -127,15 +127,15 @@ class FolderSynchronizer:
         self.logger.error(f"Failed to copy consistent version of file after {retries} attempts: {source}")
 
     def _files_differ(self, file1: Path, file2: Path) -> bool:
-        return self._md5(file1) != self._md5(file2)
+        return self._sha256(file1) != self._sha256(file2)
 
-    def _md5(self, file_path: Path) -> Optional[str]:
-        hash_md5 = hashlib.md5()
+    def _sha256(self, file_path: Path) -> Optional[str]:
+        hash_sha256 = hashlib.sha256()
         try:
             with file_path.open("rb") as f:
                 for chunk in iter(lambda: f.read(4096), b""):
-                    hash_md5.update(chunk)
-            return hash_md5.hexdigest()
+                    hash_sha256.update(chunk)
+            return hash_sha256.hexdigest()
         except Exception as e:
             self.logger.error(f"Error reading file {file_path}: {e}")
             return None
